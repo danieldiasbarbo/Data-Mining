@@ -36,49 +36,41 @@ def load_data(path):
     )
 
 
-def classificar(i_tr, i_te, o_tr, o_te, clas):
-    clas.fit(i_tr, o_tr)
-    predicao = clas.predict(i_te)
-    acuracia = accuracy_score(output_teste, predicao)
-    print(type(clas).__name__, " Acc = ", acuracia)
+def classificar(i_tr, i_te, o_tr, o_te, metodos):
+    metodos[1].fit(i_tr, o_tr)
+    predicao = metodos[1].predict(i_te)
+    acuracia = accuracy_score(o_te, predicao)
+    print(metodos[0], " Acc = ", acuracia)
 
 
-if __name__ == "__main__":
+def benchmark(metodos, proporcao, quant_iter):
     dados = load_data(path)
     input = dados.drop("ACTION_HERO", axis=1)
     output = dados.ACTION_HERO
-
     input_treino, input_teste, output_treino, output_teste = train_test_split(
-        input, output, train_size=2 / 3
+        input, output, train_size=proporcao
     )
 
-    classificar(
-        input_treino,
-        input_teste,
-        output_treino,
-        output_teste,
-        KNeighborsClassifier(n_neighbors=5),
-    )
+    for met in metodos:
+        classificar(input_treino, input_teste, output_treino, output_teste, met)
 
-    classificar(input_treino, input_teste, output_treino, output_teste, SVC())
 
-    classificar(
-        input_treino, input_teste, output_treino, output_teste, DecisionTreeClassifier()
-    )
-
-    classificar(
-        input_treino,
-        input_teste,
-        output_treino,
-        output_teste,
-        MLPClassifier(
-            solver="lbfgs",
-            alpha=1e-5,
-            hidden_layer_sizes=(50, 20),
-            random_state=1,
-            max_iter=10,
-            verbose=False,
+if __name__ == "__main__":
+    metodos = [
+        ("KNN", KNeighborsClassifier(n_neighbors=5)),
+        ("SVC", SVC()),
+        ("Arvore", DecisionTreeClassifier()),
+        (
+            "MLP",
+            MLPClassifier(
+                solver="lbfgs",
+                alpha=1e-5,
+                hidden_layer_sizes=(5, 2),
+                random_state=1,
+                max_iter=1000,
+            ),
         ),
-    )
+        ("Naive Bayes", GaussianNB()),
+    ]
 
-    classificar(input_treino, input_teste, output_treino, output_teste, GaussianNB())
+    benchmark(metodos, 2 / 3, 3)
