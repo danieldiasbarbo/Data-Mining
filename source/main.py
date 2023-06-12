@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+import time
+from tabulate import tabulate
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
@@ -9,6 +11,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import GaussianNB
 
 path = "../data/ZP-River.dat"
+quantidade_teste = 10
 
 
 def load_data(path):
@@ -37,13 +40,18 @@ def load_data(path):
 
 
 def classificar(i_tr, i_te, o_tr, o_te, metodos):
+    inicio_treino = time.time()
     metodos[1].fit(i_tr, o_tr)
+    fim_treino = time.time()
+    tempo_treino = fim_treino - inicio_treino
     predicao = metodos[1].predict(i_te)
-    acuracia = accuracy_score(o_te, predicao)
-    print(metodos[0], " Acc = ", acuracia)
+    fim_predicao = time.time()
+    tempo_predicao = fim_predicao - fim_treino
+    final = accuracy_score(o_te, predicao)
+    return [final, tempo_treino, tempo_predicao]
 
 
-def benchmark(metodos, proporcao, quant_iter):
+def benchmark(metodos, proporcao):
     dados = load_data(path)
     input = dados.drop("ACTION_HERO", axis=1)
     output = dados.ACTION_HERO
@@ -51,8 +59,13 @@ def benchmark(metodos, proporcao, quant_iter):
         input, output, train_size=proporcao
     )
 
+    resultado = {}
+
     for met in metodos:
-        classificar(input_treino, input_teste, output_treino, output_teste, met)
+        bench = classificar(input_treino, input_teste, output_treino, output_teste, met)
+        resultado[met[0]] = bench
+
+    return resultado
 
 
 if __name__ == "__main__":
@@ -73,4 +86,18 @@ if __name__ == "__main__":
         ("Naive Bayes", GaussianNB()),
     ]
 
-    benchmark(metodos, 2 / 3, 3)
+    final = {}
+
+    for i in range(quantidade_teste):
+        res = benchmark(metodos, 2 / 3)
+        for chave in res:
+            temp = list(map(lambda x: x / quantidade_teste, res[chave]))
+            f = final.get(chave, [0, 0, 0])
+            final[chave] = list(map(lambda x: x[0] + x[1], zip(temp, f)))
+
+    tabela = []
+    for chave, valores in final.items():
+        tabela.append([chave] + valores)
+
+    headers = ["Nome método", "Acurácia", "Tempo Treino", "Tempo Predição"]
+    print(tabulate(tabela, headers=headers, tablefmt="grid"))
