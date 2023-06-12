@@ -2,6 +2,8 @@
 
 O projeto consiste em uma análise comparativa de diferentes métodos de classificação usados para predizer a próxima jogada de um jogador de poker, utilizando os parâmetros de acurácia, tempo de treino e tempo de predição. Os métodos avaliados são: KNN, SVC, Árvore de Decisão, MLP e Naive Bayes.
 
+Repositório disponível em: https://github.com/danieldiasbarbo/Data-Mining
+
 ## Dependências
 
 Certifique-se de ter as seguintes dependências instaladas:
