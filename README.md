@@ -11,8 +11,9 @@ Certifique-se de ter as seguintes dependências instaladas:
 - tabulate
 
 Você pode instalá-las executando o seguinte comando:
-
+```
 pip install pandas scikit-learn tabulate
+```
 
 ## Executando o projeto
 
@@ -23,8 +24,9 @@ Siga as etapas abaixo para executar o projeto:
 3. Instale as dependências mencionadas acima.
 4. Abra o terminal ou prompt de comando e navegue até o diretório do projeto.
 5. Execute o seguinte comando para iniciar a execução do script:
-
+```
 python main.py
+```
 
 O script `main.py` executará os algoritmos de classificação nos dados fornecidos e exibirá os resultados, incluindo a acurácia dos modelos.
 
